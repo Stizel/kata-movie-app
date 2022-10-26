@@ -1,0 +1,8 @@
+@import 'reset-css/reset.css';
+
+.container {
+  max-width: 1010px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 23px 39px 23px 32px;
+}
