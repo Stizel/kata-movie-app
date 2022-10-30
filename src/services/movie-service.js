@@ -13,13 +13,14 @@ export default class MovieService {
   }
 
   getMovies = async (searchQuery, page) => {
-    const url = `/search/movie?api_key=${this.apiKey}&language=en-US&query=${searchQuery}&page=${page}&include_adult=false`
+    let query = searchQuery
+    if (searchQuery === '') query = 'return'
+    const url = `/search/movie?api_key=${this.apiKey}&language=en-US&query=${query}&page=${page}&include_adult=false`
     const res = await this.getResource(url)
     const body = await res.json()
     console.log(body)
     return {
       movies: body.results,
-      totalPages: body.total_pages,
       totalResults: body.total_results,
     }
   }

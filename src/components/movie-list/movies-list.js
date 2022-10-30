@@ -5,8 +5,6 @@ import Movie from '../movie/movie'
 import './movies-list.css'
 
 function MoviesList({ movies, status }) {
-  // const moviez = movies.map((movie) => <Movie key={movie.id} movie={movie} />)
-
   let content
 
   switch (status) {
@@ -16,7 +14,14 @@ function MoviesList({ movies, status }) {
       )
       break
     case 'error':
-      content = <Alert message="Something has gone wrong" description="Cant get movies" type="error" showIcon />
+      content = (
+        <Alert
+          message="Something has gone wrong"
+          description="Can't get the movies, please go to another site"
+          type="error"
+          showIcon
+        />
+      )
       break
     case 'loading':
       content = <Spin size="large" />

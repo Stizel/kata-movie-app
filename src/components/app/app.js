@@ -2,7 +2,8 @@ import React, { Component } from 'react'
 import 'antd/dist/antd.min.css'
 import './app.css'
 import { Alert, Pagination } from 'antd'
-import { Offline } from 'react-detect-offline'
+import { Offline, Online } from 'react-detect-offline'
+import { debounce } from 'lodash'
 
 import MoviesList from '../movie-list/movies-list'
 import MovieService from '../../services/movie-service'
@@ -16,10 +17,10 @@ export default class App extends Component {
 
     this.state = {
       movies: [],
-      query: 'return',
+      query: '',
       page: 1,
       status: 'loading',
-      totalPages: 0,
+      totalResults: 0,
     }
 
     this.moviesOnLoaded = (res) => {
@@ -30,7 +31,7 @@ export default class App extends Component {
       } else {
         this.setState({
           movies: res.movies,
-          totalPages: res.totalPages,
+          totalResults: res.totalResults,
           status: 'ok',
         })
       }
@@ -46,22 +47,40 @@ export default class App extends Component {
       this.movieService.getMovies(query, page).then(this.moviesOnLoaded).catch(this.onError)
     }
 
-    this.paginationHandler = (num) => {
+    this.paginationHandler = (page) => {
       this.setState({
-        page: num,
+        page,
       })
-      this.getMovies()
     }
 
+    this.inputHandler = (query) => {
+      this.setState({
+        query,
+      })
+    }
+  }
+
+  componentDidMount() {
     this.getMovies()
   }
 
-  render() {
-    const { movies, status, page, totalPages } = this.state
+  componentDidUpdate(prevProps, prevState) {
+    const { page, query } = this.state
 
+    if (query !== prevState.query) {
+      this.setState({ status: 'loading', page: 1, totalResults: 0 })
+      this.getMovies()
+    } else if (page !== prevState.page) {
+      this.setState({ status: 'loading' })
+      this.getMovies()
+    }
+  }
+
+  render() {
+    const { movies, status, page, totalResults } = this.state
     return (
       <div className="app">
-        <Header />
+        <Header inputHandler={debounce(this.inputHandler, 1500)} />
         <Offline>
           <Alert
             message="You have no internet connection"
@@ -70,15 +89,17 @@ export default class App extends Component {
             showIcon
           />
         </Offline>
-        <MoviesList movies={movies} status={status} />
-        <Pagination
-          className="pagination"
-          current={page}
-          pageSize={20}
-          total={totalPages}
-          onChange={(num) => this.paginationHandler(num)}
-          hideOnSinglePage
-        />
+        <Online>
+          <MoviesList movies={movies} status={status} />
+          <Pagination
+            className="pagination"
+            current={page}
+            pageSize={20}
+            total={totalResults}
+            onChange={(num) => this.paginationHandler(num)}
+            hideOnSinglePage
+          />
+        </Online>
       </div>
     )
   }
