@@ -16,7 +16,22 @@ export default class MovieService {
     const url = `/search/movie?api_key=${this.apiKey}&language=en-US&query=${searchQuery}&page=${page}&include_adult=false`
     const res = await this.getResource(url)
     const body = await res.json()
-    const movies = body.results
-    return movies
+    console.log(body)
+    return {
+      movies: body.results,
+      totalPages: body.total_pages,
+      totalResults: body.total_results,
+    }
+  }
+
+  getGenres = async (movieId) => {
+    const url = `/movie/${movieId}?api_key=${this.apiKey}&language=en-US`
+    const res = await this.getResource(url)
+    const body = await res.json()
+    const genres = body.genres.map((genre) => genre.name)
+    return genres
   }
 }
+const movieService = new MovieService()
+
+movieService.getGenres(43641)

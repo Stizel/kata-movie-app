@@ -1,8 +1,29 @@
-@import 'reset-css/reset.css';
-
-.container {
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+body {
+  font-family: 'Inter', sans-serif;
+  background: #F7F7F7;
+}
+.app{
   max-width: 1010px;
+  width: 100%;
+  background-color: #fff;
   margin: 0 auto;
-  background: #ffffff;
-  padding: 23px 39px 23px 32px;
+  padding: 0 2rem 2rem;
+}
+@media (max-width: 460px) {
+  .app {
+    padding: 0 1rem 1rem;
+  }
+}
+
+/*            pagination             */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 39px;
+}
+
+.ant-pagination-options{
+  display: none;
 }
