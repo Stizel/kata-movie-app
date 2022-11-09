@@ -1,12 +1,12 @@
-import React from 'react'
 import { Row, Spin, Alert } from 'antd'
+import PropTypes from 'prop-types'
 
 import Movie from '../movie/movie'
 import './movies-list.css'
 
-function MoviesList({ movies, status }) {
+export default function MoviesList({ movies, status, selectedTab, ratedMovies, rateHandler }) {
   let content
-
+  const showMovies = selectedTab === 'search' ? movies : ratedMovies
   switch (status) {
     case 'no-content':
       content = (
@@ -27,7 +27,10 @@ function MoviesList({ movies, status }) {
       content = <Spin size="large" />
       break
     default:
-      content = movies.map((movie) => <Movie key={movie.id} movie={movie} />)
+      content = showMovies.map((movie) => {
+        const { id } = movie
+        return <Movie key={id} movie={movie} rateHandler={rateHandler} />
+      })
   }
   return (
     <div className="movies-list">
@@ -36,4 +39,15 @@ function MoviesList({ movies, status }) {
   )
 }
 
-export default MoviesList
+MoviesList.defaultProps = {
+  movies: [],
+  status: 'loading',
+  ratedMovies: [],
+  rateHandler: () => {},
+}
+MoviesList.propTypes = {
+  movies: PropTypes.arrayOf(PropTypes.objectOf),
+  status: PropTypes.string,
+  ratedMovies: PropTypes.arrayOf(PropTypes.objectOf),
+  rateHandler: PropTypes.func,
+}
