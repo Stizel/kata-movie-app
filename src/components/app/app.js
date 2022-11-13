@@ -19,7 +19,8 @@ export default class App extends Component {
     this.state = {
       movies: [],
       query: '',
-      page: 1,
+      searchPage: 1,
+      ratedPage: 1,
       status: 'loading',
       totalResults: 0,
       genres: [],
@@ -50,8 +51,8 @@ export default class App extends Component {
     }
 
     this.getMovies = () => {
-      const { query, page } = this.state
-      this.movieService.getMovies(query, page).then(this.moviesOnLoaded).catch(this.onError)
+      const { query, searchPage } = this.state
+      this.movieService.getMovies(query, searchPage).then(this.moviesOnLoaded).catch(this.onError)
     }
 
     this.genresOnLoaded = (genres) => {
@@ -75,9 +76,16 @@ export default class App extends Component {
     }
 
     this.paginationHandler = (page) => {
-      this.setState({
-        page,
-      })
+      const { selectedTab } = this.state
+      if (selectedTab === 'search') {
+        this.setState({
+          searchPage: page,
+        })
+      } else {
+        this.setState({
+          ratedPage: page,
+        })
+      }
     }
 
     this.inputHandler = (query) => {
@@ -99,8 +107,10 @@ export default class App extends Component {
       })
     }
 
-    this.getRatedMovies = (guestSessionId, page = 1) =>
-      this.movieService.getRatedMovies(guestSessionId, page).then(this.getRatedMoviesOnLoaded)
+    this.getRatedMovies = () => {
+      const { guestSessionId, ratedPage } = this.state
+      this.movieService.getRatedMovies(guestSessionId, ratedPage).then(this.getRatedMoviesOnLoaded)
+    }
 
     this.rateHandler = (id, value) => {
       const { guestSessionId } = this.state
@@ -128,28 +138,41 @@ export default class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { page, query, selectedTab, guestSessionId } = this.state
-    if (selectedTab !== prevState.selectedTab) {
-      this.setState({ page: 1, status: 'loading' })
-      this.getMovies()
-      this.getRatedMovies(guestSessionId, page)
-    }
-    if (guestSessionId !== prevState.guestSessionId) {
-      this.getRatedMovies(guestSessionId, page)
+    const { searchPage, ratedPage, query, selectedTab } = this.state
+
+    if (selectedTab !== prevState.selectedTab && selectedTab === 'rated') {
+      this.setState({ status: 'loading' })
+      this.getRatedMovies()
     }
     if (query !== prevState.query) {
-      this.setState({ status: 'loading', page: 1, totalResults: 0 })
+      this.setState({ status: 'loading', searchPage: 1, totalResults: 0 })
       this.getMovies()
-    } else if (page !== prevState.page) {
+    }
+    if (searchPage !== prevState.searchPage) {
       this.setState({ status: 'loading' })
       this.getMovies()
+    }
+    if (ratedPage !== prevState.ratedPage) {
+      this.setState({ status: 'loading' })
+      this.getRatedMovies()
     }
   }
 
   render() {
-    const { movies, genres, status, page, totalResults, selectedTab, ratedMovies, totalRated, localRatedMovies } =
-      this.state
+    const {
+      movies,
+      genres,
+      status,
+      searchPage,
+      ratedPage,
+      totalResults,
+      selectedTab,
+      ratedMovies,
+      totalRated,
+      localRatedMovies,
+    } = this.state
     const totalMovies = selectedTab === 'search' ? totalResults : totalRated
+    const page = selectedTab === 'search' ? searchPage : ratedPage
     return (
       <div className="app">
         <Header

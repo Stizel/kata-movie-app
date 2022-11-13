@@ -6,7 +6,18 @@ import PropTypes from 'prop-types'
 export default class Header extends Component {
   constructor(props) {
     super(props)
+    const { inputHandler } = this.props
+
+    this.state = {
+      label: '',
+    }
+
     this.inputRef = React.createRef()
+
+    this.onLabelChange = (e) => {
+      this.setState({ label: e.target.value })
+      inputHandler(e.target.value)
+    }
   }
 
   componentDidMount() {
@@ -17,7 +28,8 @@ export default class Header extends Component {
   }
 
   render() {
-    const { inputHandler, selectedTab, tabHandler } = this.props
+    const { selectedTab, tabHandler } = this.props
+    const { label } = this.state
     return (
       <header className="header">
         <Tabs
@@ -33,7 +45,8 @@ export default class Header extends Component {
                 <Input
                   ref={this.inputRef}
                   placeholder="Type to search..."
-                  onChange={(e) => inputHandler(e.target.value)}
+                  onChange={this.onLabelChange}
+                  value={label}
                 />
               ),
             },
