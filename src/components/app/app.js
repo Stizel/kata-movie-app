@@ -138,23 +138,28 @@ export default class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { searchPage, ratedPage, query, selectedTab } = this.state
+    const { searchPage, ratedPage, query, selectedTab, status } = this.state
 
-    if (selectedTab !== prevState.selectedTab && selectedTab === 'rated') {
-      this.setState({ status: 'loading' })
-      this.getRatedMovies()
-    }
     if (query !== prevState.query) {
-      this.setState({ status: 'loading', searchPage: 1, totalResults: 0 })
-      this.getMovies()
+      this.setState({ status: 'loading-movies', searchPage: 1, totalResults: 0 })
     }
     if (searchPage !== prevState.searchPage) {
-      this.setState({ status: 'loading' })
-      this.getMovies()
+      this.setState({ status: 'loading-movies' })
+    }
+
+    if (selectedTab !== prevState.selectedTab && selectedTab === 'rated') {
+      this.setState({ status: 'loading-rated' })
     }
     if (ratedPage !== prevState.ratedPage) {
-      this.setState({ status: 'loading' })
-      this.getRatedMovies()
+      this.setState({ status: 'loading-rated' })
+    }
+
+    if (status !== prevState.status) {
+      if (status === 'loading-movies') {
+        this.getMovies()
+      } else if (status === 'loading-rated') {
+        this.getRatedMovies()
+      }
     }
   }
 

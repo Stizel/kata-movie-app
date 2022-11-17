@@ -23,7 +23,10 @@ export default function MoviesList({ movies, status, selectedTab, ratedMovies, r
         />
       )
       break
-    case 'loading':
+    case 'loading-movies':
+      content = <Spin size="large" />
+      break
+    case 'loading-rated':
       content = <Spin size="large" />
       break
     default:
